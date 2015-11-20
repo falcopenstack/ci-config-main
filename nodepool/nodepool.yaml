@@ -1,0 +1,59 @@
+script-dir: /etc/nodepool/scripts
+elements-dir: /etc/nodepool/elements
+images-dir: /opt/nodepool_dib
+
+cron:
+  cleanup: '*/1 * * * *'
+  check: '*/15 * * * *'
+  image-update: '6 7 * * *'
+
+zmq-publishers:
+  - tcp://localhost:8888
+
+gearman-servers:
+  - host: 127.0.0.1
+
+labels:
+  - name: devstack-slave
+    image: dpc
+    min-ready: 2
+    providers:
+      - name: ci-openstack01
+
+diskimages:
+    - name: dpc
+      elements:
+        - ubuntu
+        - vm
+        - openstack-repos
+        - puppet
+        - nodepool-base
+        - node-devstack
+      release: trusty
+      env-vars:
+        TMPDIR: /opt/dib_tmp
+        DIB_IMAGE_CACHE: /opt/dib_cache
+
+providers:
+  - name: ci-openstack01
+    username: 'admin'
+    password: 'openstack'
+    auth-url: 'http://192.168.2.50:5000/v2.0'
+    project-name: 'admin'
+    max-servers: 2
+    boot-timeout: 1200
+    launch-timeout: 3600
+    keypair: 'jenkins'
+    pool: 'external'
+    networks:
+      #TODO: Enter the ID of the "internal" network on the provider
+      - net-id: '3341208a-8900-47de-9455-1f81c3b87cbe'
+    images:
+      - name: dpc
+        min-ram: 8192
+        diskimage: dpc
+        username: jenkins
+        private-key: '/home/nodepool/.ssh/id_rsa'
+
+targets:
+  - name: jenkins1

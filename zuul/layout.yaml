@@ -1,0 +1,86 @@
+#
+# TODO
+#
+# Change the following values depending on the mode you want to operate in.
+# Test Mode:
+#   name: openstack-dev/ci-sandbox
+#   Change pipeline name to 'silent'
+# Production Mode:
+#   name: openstack/cinder
+#   Change pipeline name to 'check'
+#
+# When our driver code has been merged upstream, use the following job name:
+#   dsvm-falc-fss-iscsi
+# This job assumes that our driver code is already present in the upstream 
+# repository downloaded by devstack during the test job.
+#
+# When testing driver code that has not yet been merged upstream, use the job:
+#   dsvm-falc-fss-iscsi-customdriver
+# This job downloads our driver code from our own repository and copies it 
+# into the upstream repository downloaded by devstack during the test job.
+#
+projects:
+  - name: openstack-dev/ci-sandbox
+    silent:
+      - dsvm-falc-fss-iscsi-customdriver
+
+#
+# Include openstack_functions.py to enable single-use nodes in nodepool.
+#
+includes:
+    # These functions are what enables single use nodes in nodepool.
+  - python-file: openstack_functions.py
+
+#
+# Define all dsvm-* jobs to be run in single-use nodes
+#
+jobs:
+  - name: ^dsvm-.*$
+    parameter-function: single_use_node
+
+#
+# Define pipelines
+#
+pipelines:
+  - name: check
+    description: CI in production mode. Results are publicly posted to Gerrit.
+    success-message: "Test job successful."
+    failure-message: "Test job failed."
+    footer-message: "Leave a comment with 'recheck falconstor' to trigger another test job. For 3rd party CI contact info: https://wiki.openstack.org/wiki/ThirdPartySystems"
+    manager: IndependentPipelineManager
+    trigger:
+      gerrit:
+        - event: patchset-created
+        - event: change-restored
+        # recheck trigger that runs the check pipeline jobs when someone
+        # adds a comment to a review that says "recheck falconstor".
+        - event: comment-added
+          comment: (?i)^(Patch Set [0-9]+:)?( [\w\\+-]*)*(\n\n)?\s*recheck falconstor\s*$
+    success:
+      gerrit:
+        verified: 1
+    failure:
+      gerrit:
+        verified: -1
+
+  - name: silent
+    description: CI in testing mode. Results are emailed but not publicly posted to Gerrit.
+    manager: IndependentPipelineManager
+    trigger:
+      gerrit:
+        - event: patchset-created
+        - event: change-restored
+        # recheck trigger that runs the check pipeline jobs when someone
+        # adds a comment to a review that says "recheck falconstor".
+        - event: comment-added
+          comment: (?i)^(Patch Set [0-9]+:)?( [\w\\+-]*)*(\n\n)?\s*recheck falconstor\s*$
+    success:
+      smtp:
+        to: openstack-ci@falconstor.com
+        from: openstack-ci@falconstor.com
+        subject: 'CI job passed for {change.project} {change.number},{change.patchset}'
+    failure:
+      smtp:
+        to: openstack-ci@falconstor.com
+        from: openstack-ci@falconstor.com
+        subject: 'CI job failed for {change.project} {change.number},{change.patchset}'

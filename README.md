@@ -1,1 +1,1 @@
-# ci-project-config
+# project-config for FalconStor CI

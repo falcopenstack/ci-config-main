@@ -1,0 +1,83 @@
+- job-template:
+    name: 'dsvm-falc-fss-iscsi'
+    node: '{node}'
+
+    wrappers:
+      - timeout:
+          timeout: 300
+          fail: true
+      - timestamps
+
+    builders:
+      - link-logs
+      - net-info
+      - devstack-checkout
+      - shell: |
+          #!/bin/bash -xe
+
+          function pre_test_hook {{
+
+          echo "Configure the local.conf file to properly setup FalconStor driver in cinder.conf"
+          cat <<EOF >$BASE/new/devstack/local.conf
+
+          [[post-config|\$CINDER_CONF]]
+          [DEFAULT]
+          enabled_backends=FSS
+          default_volume_type=FSSISCSIDriver
+
+          [FSS]
+          volume_driver=cinder.volume.drivers.falconstor.iscsi.FSSISCSIDriver
+          volume_backend_name=FSSISCSIDriver
+          # TODO Update these values if the FSS being used for CI changes
+          san_login=root
+          san_password=IPStor101
+          san_ip=192.168.2.22
+          fss_pool=1
+
+          # Use post-extra because the tempest configuration file is
+          # overwritten with the .sample after post-config.
+          [[post-extra|\$TEMPEST_CONFIG]]
+          [volume]
+          storage_protocol=iSCSI
+          vendor_name=FalconStor
+          [volume-feature-enabled]
+          backup=false
+          EOF
+
+          echo "Configure localrc file to properly setup CINDER_ENABLED_BACKENDS"
+          cat <<EOF >>$BASE/new/devstack/localrc
+          CINDER_ENABLED_BACKENDS=FSS:FSSISCSIDriver
+          ATTACH_ENCRYPTED_VOLUME_AVAILABLE=False
+          EOF
+
+          }}
+
+          export -f pre_test_hook
+
+          # To keep our CINDER_ENABLED_BACKENDS configuration in localrc
+          export KEEP_LOCALRC=true
+
+          export PYTHONUNBUFFERED=true
+          export DEVSTACK_GATE_TIMEOUT=300
+          export DEVSTACK_GATE_TEMPEST=1
+          export TEMPEST_CONCURRENCY=1
+          export DEVSTACK_GATE_NEUTRON=1
+          echo "Disable test_shelve_volume because it fails due to SSH timeout (Bug 1298472)"
+          export 'DEVSTACK_GATE_TEMPEST_REGEX=^(?=.*volume)(?!.*boto)(?!.*test_volume_boot_pattern)(?!.*test_minimum_basic_scenario)(?!.*volume_transfer)(?!.*test_shelve_volume).*'
+
+          export GIT_BASE="https://review.openstack.org/p"
+
+          if [ -z $ZUUL_PROJECT ]; then
+              export ZUUL_PROJECT=openstack-dev/ci-sandbox
+          fi
+          if [ -z $ZUUL_BRANCH ]; then
+              export ZUUL_BRANCH=master
+          fi
+
+          cp devstack-gate/devstack-vm-gate-wrap.sh ./safe-devstack-vm-gate-wrap.sh
+          ./safe-devstack-vm-gate-wrap.sh
+
+    publishers:
+      - devstack-logs
+      - console-log
+      - devstack-logs-local

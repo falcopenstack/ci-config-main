@@ -1,0 +1,16 @@
+#
+# TODO
+# Change the following values depending on the mode you want to operate in.
+# Test Mode:
+#    name: ci-sandbox
+# Production Mode:
+#    name: cinder
+#
+- project:
+    name: 'ci-sandbox'
+    node: 'devstack-slave'
+    vendor: FalconStor
+
+    jobs:
+        - dsvm-falc-fss-iscsi
+        - dsvm-falc-fss-iscsi-customdriver
