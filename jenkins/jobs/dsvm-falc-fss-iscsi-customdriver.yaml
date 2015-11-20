@@ -91,4 +91,3 @@
     publishers:
       - devstack-logs
       - console-log
-      - devstack-logs-local
