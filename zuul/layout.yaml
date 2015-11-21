@@ -76,11 +76,11 @@ pipelines:
           comment: (?i)^(Patch Set [0-9]+:)?( [\w\\+-]*)*(\n\n)?\s*recheck falconstor\s*$
     success:
       smtp:
-        to: openstack-ci@falconstor.com
+        to: siddharth.bhatt@falconstor.com
         from: openstack-ci@falconstor.com
         subject: 'CI job passed for {change.project} {change.number},{change.patchset}'
     failure:
       smtp:
-        to: openstack-ci@falconstor.com
+        to: siddharth.bhatt@falconstor.com
         from: openstack-ci@falconstor.com
         subject: 'CI job failed for {change.project} {change.number},{change.patchset}'
