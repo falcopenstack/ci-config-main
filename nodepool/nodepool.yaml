@@ -16,6 +16,7 @@ gearman-servers:
 labels:
   - name: devstack-slave
     image: dpc
+    ready-script: set_iscsi_name.sh
     min-ready: 2
     providers:
       - name: ci-openstack01

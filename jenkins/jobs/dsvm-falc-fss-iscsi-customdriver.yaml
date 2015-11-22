@@ -17,11 +17,6 @@
 
           function pre_test_hook {{
 
-          echo "Generating random iSCSI initiator name"
-          INITNAME="InitiatorName=iqn.1993-08.org.debian:01:$RANDOM"
-          echo "Setting $INITNAME"
-          sudo echo "$INITNAME" > /etc/iscsi/initiatorname.iscsi
-
           echo "Configure the local.conf file to properly setup FalconStor driver in cinder.conf"
           cat <<EOF >$BASE/new/devstack/local.conf
 
