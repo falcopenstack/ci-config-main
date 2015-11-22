@@ -14,12 +14,12 @@ gearman-servers:
   - host: 127.0.0.1
 
 labels:
-  - name: devstack-slave
+  - name: dsvm-slave
     image: dpc
     ready-script: set_iscsi_name.sh
     min-ready: 2
     providers:
-      - name: ci-openstack01
+      - name: ci-opstack01
 
 diskimages:
     - name: dpc
@@ -36,7 +36,7 @@ diskimages:
         DIB_IMAGE_CACHE: /opt/dib_cache
 
 providers:
-  - name: ci-openstack01
+  - name: ci-opstack01
     username: 'admin'
     password: 'openstack'
     auth-url: 'http://192.168.2.50:5000/v2.0'

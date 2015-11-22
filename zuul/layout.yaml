@@ -50,8 +50,8 @@ pipelines:
     manager: IndependentPipelineManager
     trigger:
       gerrit:
-        - event: patchset-created
-        - event: change-restored
+        #- event: patchset-created
+        #- event: change-restored
         # recheck trigger that runs the check pipeline jobs when someone
         # adds a comment to a review that says "recheck falconstor".
         - event: comment-added

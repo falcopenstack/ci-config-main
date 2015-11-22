@@ -8,7 +8,7 @@
 #
 - project:
     name: 'ci-sandbox'
-    node: 'devstack-slave'
+    node: 'dsvm-slave'
     vendor: FalconStor
 
     jobs:
