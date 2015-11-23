@@ -64,7 +64,7 @@
           export TEMPEST_CONCURRENCY=1
           export DEVSTACK_GATE_NEUTRON=1
           echo "Disable test_shelve_volume because it fails due to SSH timeout (Bug 1298472)"
-          export 'DEVSTACK_GATE_TEMPEST_REGEX=^(?=.*volume)(?!.*boto)(?!.*test_volume_boot_pattern)(?!.*test_minimum_basic_scenario)(?!.*volume_transfer)(?!.*test_shelve_volume).*'
+          export 'DEVSTACK_GATE_TEMPEST_REGEX=^(?=.*volume)(?!.*boto)(?!.*test_volume_boot_pattern)(?!.*test_minimum_basic_scenario)(?!.*test_shelve_volume).*'
 
           export GIT_BASE="https://review.openstack.org/p"
 
