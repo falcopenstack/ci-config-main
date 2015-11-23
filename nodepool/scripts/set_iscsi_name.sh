@@ -14,5 +14,9 @@ echo $HOSTNAME > /tmp/image-hostname.txt
 sudo mv /tmp/image-hostname.txt /etc/image-hostname.txt
 
 # Set iSCSI initiator name to make it unique
-INITNAME="InitiatorName=iqn.1993-08.org.debian:01:$HOSTNAME"
-echo "$INITNAME" | sudo tee /etc/iscsi/initiatorname.iscsi
+INITNAME=`sudo iscsi-iname`
+if [ -z "$INITNAME" ]; then
+    INITNAME="iqn.1993-08.org.debian:01:$HOSTNAME"
+fi
+echo "InitiatorName=$INITNAME" | sudo tee /etc/iscsi/initiatorname.iscsi
+sudo service open-iscsi restart
