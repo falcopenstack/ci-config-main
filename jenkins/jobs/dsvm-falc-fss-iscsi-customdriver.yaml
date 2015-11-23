@@ -40,6 +40,7 @@
           [volume]
           storage_protocol=iSCSI
           vendor_name=FalconStor
+          build_timeout=600
           [volume-feature-enabled]
           backup=false
           EOF
