@@ -7,10 +7,10 @@
   node: '{node}'
 
   wrappers:
-    -timeout:
+    - timeout:
       timeout: 300
       fail: true
-    -timestamps
+    - timestamps
 
   builders:
     - link-logs
@@ -35,10 +35,10 @@
   node: '{node}'
 
   wrappers:
-    -timeout:
+    - timeout:
       timeout: 300
       fail: true
-    -timestamps
+    - timestamps
 
   builders:
     - link-logs
