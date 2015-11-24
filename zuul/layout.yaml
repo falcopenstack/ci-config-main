@@ -7,7 +7,7 @@ projects:
   # Project name
   - name: openstack-dev/ci-sandbox
     # Pipeline name
-    check:
+    silent:
       # Job name
       - dsvm-ci-sandbox-fss-iscsi-custom
 
