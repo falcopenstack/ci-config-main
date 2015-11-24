@@ -8,7 +8,6 @@
 - project:
     name: 'ci-sandbox'
     node: 'dsvm-slave'
-    vendor: 'FalconStor'
     jobs:
         - 'dsvm-{name}-fss-iscsi'
         - 'dsvm-{name}-fss-iscsi-custom'
@@ -16,7 +15,6 @@
 - project:
     name: 'cinder'
     node: 'dsvm-slave'
-    vendor: 'FalconStor'
     jobs:
         - 'dsvm-{name}-fss-iscsi'
         - 'dsvm-{name}-fss-iscsi-custom'
