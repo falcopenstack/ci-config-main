@@ -1,42 +1,43 @@
 #
 # TODO
-# 
 # Remember to restart zuul and zuul-merger if you update this file.
 #
-# Change the following values depending on the mode you want to operate in.
-# Test Mode:
-#   name: openstack-dev/ci-sandbox
-#   Change pipeline name to 'silent'
-#   Change job name to either (1) or (2) below. Use only one of the two names.
-# Production Mode:
-#   name: openstack/cinder
-#   Change pipeline name to 'check'
-#   Change job name to either (3) or (4) below. Use only one of the two names.
-#
-# Available jobs:
-# (1) dsvm-ci-sandbox-fss-iscsi
-# (2) dsvm-ci-sandbox-fss-iscsi-custom
-# (3) dsvm-cinder-fss-iscsi
-# (4) dsvm-cinder-fss-iscsi-custom
-#
-# The dsvm-ci-sandbox-* jobs (1 or 2) should be used when testing against 
-# the project named openstack-dev/ci-sandbox
-#
-# The dsvm-cinder-* jobs (3 or 4) should be used when testing against 
-# the project named openstack/cinder
-#
-# The *-custom jobs (2 or 4) should be used when our driver is not present in the
-# upstream repo, i.e. it is not yet merged into the official repo or has been removed
-#
-# Once our driver is merged into the official repo, change the job to 1 or 3.
-#
-# DO NOT ENABLE MULTIPLE JOBS ON ANY PIPELINE
-# Use only one of the four depending on the situation.
-#
+
 projects:
+  # Project name
   - name: openstack-dev/ci-sandbox
-    silent:
+    # Pipeline name
+    check:
+      # Job name
       - dsvm-ci-sandbox-fss-iscsi-custom
+
+#
+# Modify the three values above based on the following:
+
+#  Q. What do you want to use the CI for?
+# A1. Just testing internally: set the project name to openstack-dev/ci-sandbox.
+#     This is a testing ground for the CI. You can submit dummy patches to this
+#     project to trigger the CI.
+# A2. Officially testing cinder patches: set the project name to openstack/cinder.
+#     The CI will be in production mode and will run test jobs for every patch
+#     submitted to the official cinder project.
+
+#  Q. What do you want to do with the results?
+# A1. Just email the results internally: set the pipeline to silent.
+#     This is useful if you want to run jobs without posting the results to Gerrit.
+# A2. Post the results to Gerrit: set the pipeline to check.
+#     When the job finishes, the results will be posted to Gerrit and the link to 
+#     the logs will be included. This is required when the CI is in production mode.
+
+#  Q. Is our driver code officially merged into the openstack/cinder repo?
+# A1. Yes: Set the job name to dsvm-<proj>-fss-iscsi. Replace <proj> with either
+#     ci-sandbox or cinder. It should match the second part of the project name.
+# A2. No: Set the job name to dsvm-<proj>-fss-iscsi-custom. Replace <proj> with
+#     either ci-sandbox or cinder. It should match the second part of the project name.
+#     The '-custom' suffix at the end of the job name indicates that the job will 
+#     separately download our driver code from our private repo. Once our driver is 
+#     merged into the upstream repo, we no longer need to do this, and the '-custom' 
+#     suffix can be removed.
 
 #
 # Include openstack_functions.py to enable single-use nodes in nodepool.
