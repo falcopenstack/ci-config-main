@@ -1,16 +1,22 @@
-# 
-# TODO
-# Set the project name to 'ci-sandbox' (for testing) or 'cinder' (for production)
 #
 # This file simply defines the jobs available and the nodes to be used
+# The job definitions are in fss-iscsi-jobs.yaml
+#
 # The Zuul layout.yaml defines which jobs are actually run for each pipeline
 # Make sure layout.yaml is configured to run ANY ONE of the two jobs below
 #
 - project:
     name: 'ci-sandbox'
     node: 'dsvm-slave'
-    vendor: FalconStor
-
+    vendor: 'FalconStor'
     jobs:
-        - dsvm-falc-fss-iscsi
-        - dsvm-falc-fss-iscsi-customdriver
+        - 'dsvm-{name}-fss-iscsi'
+        - 'dsvm-{name}-fss-iscsi-custom'
+
+- project:
+    name: 'cinder'
+    node: 'dsvm-slave'
+    vendor: 'FalconStor'
+    jobs:
+        - 'dsvm-{name}-fss-iscsi'
+        - 'dsvm-{name}-fss-iscsi-custom'
