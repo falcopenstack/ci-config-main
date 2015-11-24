@@ -1,13 +1,20 @@
 #
-# TODO
-# Change the following values depending on the mode you want to operate in.
-# Test Mode:
-#    name: ci-sandbox
-# Production Mode:
-#    name: cinder
+# Defines jobs for both ci-sandbox (testing mode) and cinder (production mode)
+# This file simply defines the jobs available and the nodes to be used
+# The Zuul layout.yaml defines which jobs are actually run for each pipeline
+# Make sure layout.yaml is configured to run ANY ONE of the two jobs below
 #
 - project:
     name: 'ci-sandbox'
+    node: 'dsvm-slave'
+    vendor: FalconStor
+
+    jobs:
+        - dsvm-falc-fss-iscsi
+        - dsvm-falc-fss-iscsi-customdriver
+
+- project:
+    name: 'cinder'
     node: 'dsvm-slave'
     vendor: FalconStor
 
