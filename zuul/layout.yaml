@@ -25,7 +25,7 @@
 #
 projects:
   - name: openstack-dev/ci-sandbox
-    check:
+    silent:
       - dsvm-falc-fss-iscsi-customdriver
 
 #
