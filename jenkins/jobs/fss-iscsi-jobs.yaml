@@ -8,8 +8,8 @@
 
     wrappers:
       - timeout:
-        timeout: 300
-        fail: true
+          timeout: 300
+          fail: true
       - timestamps
 
     builders:
@@ -36,8 +36,8 @@
 
     wrappers:
       - timeout:
-        timeout: 300
-        fail: true
+          timeout: 300
+          fail: true
       - timestamps
 
     builders:
