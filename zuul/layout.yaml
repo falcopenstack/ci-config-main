@@ -73,10 +73,12 @@ pipelines:
           comment: (?i)^(Patch Set [0-9]+:)?( [\w\\+-]*)*(\n\n)?\s*recheck falconstor\s*$
     success:
       gerrit:
-        verified: 1
+        # Change this value to 1 to enable success votes
+        verified: 0
     failure:
       gerrit:
-        verified: -1
+        # Change this value to -1 to enable failure votes
+        verified: 0
 
   - name: silent
     description: CI in testing mode. Results are emailed but not publicly posted to Gerrit.
