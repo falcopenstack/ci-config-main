@@ -204,9 +204,9 @@
           mkdir falconstor
           chmod 0755 falconstor
           cd $BASE/new/cinder/cinder/volume/drivers/falconstor
-          wget https://raw.githubusercontent.com/falcopenstack/cinder/newfalcdriver/cinder/volume/drivers/falconstor/__init__.py
-          wget https://raw.githubusercontent.com/falcopenstack/cinder/newfalcdriver/cinder/volume/drivers/falconstor/iscsi.py
-          wget https://raw.githubusercontent.com/falcopenstack/cinder/newfalcdriver/cinder/volume/drivers/falconstor/rest_proxy.py
+          wget https://raw.githubusercontent.com/falcopenstack/cinderdriver/master/cinder/volume/drivers/falconstor/__init__.py
+          wget https://raw.githubusercontent.com/falcopenstack/cinderdriver/master/cinder/volume/drivers/falconstor/iscsi.py
+          wget https://raw.githubusercontent.com/falcopenstack/cinderdriver/master/cinder/volume/drivers/falconstor/rest_proxy.py
           chmod 0644 *.py
           }
           export -f pre_test_hook
