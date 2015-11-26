@@ -13,6 +13,9 @@ fi
 echo $HOSTNAME > /tmp/image-hostname.txt
 sudo mv /tmp/image-hostname.txt /etc/image-hostname.txt
 
+# Quick fix so that slave node can resolve the master
+echo "192.168.2.32 ci-master" | sudo tee -a /etc/hosts
+
 # Set iSCSI initiator name to make it unique
 INITNAME=`sudo iscsi-iname`
 if [ -z "$INITNAME" ]; then
