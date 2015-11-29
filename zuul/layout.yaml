@@ -61,7 +61,7 @@ pipelines:
     description: CI in production mode. Results are publicly posted to Gerrit.
     success-message: "Build succeeded."
     failure-message: "Build failed."
-    footer-message: "Leave a comment with 'recheck falconstor' to trigger another test. For 3rd party CI contact info: https://wiki.openstack.org/wiki/ThirdPartySystems"
+    footer-message: "Leave a comment with 'recheck falconstor' to trigger another test. For 3rd party CI contact info: https://wiki.openstack.org/wiki/ThirdPartySystems/FalconStor_CI"
     manager: IndependentPipelineManager
     trigger:
       gerrit:
