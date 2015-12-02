@@ -5,11 +5,11 @@
 
 projects:
   # Project name
-  - name: openstack-dev/ci-sandbox
+  - name: openstack/cinder
     # Pipeline name
     silent:
       # Job name
-      - dsvm-ci-sandbox-fss-iscsi-custom
+      - dsvm-cinder-fss-iscsi-custom
 
 #
 # Modify the three values above based on the following:
