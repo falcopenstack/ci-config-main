@@ -9,6 +9,7 @@
     wrappers:
       - timeout:
           timeout: 300
+          timeout-var: 'BUILD_TIMEOUT'
           fail: true
       - timestamps
 
