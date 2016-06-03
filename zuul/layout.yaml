@@ -75,10 +75,18 @@ pipelines:
       gerrit:
         # Change this value to 1 to enable success votes
         verified: 0
+      smtp:
+        to: openstack-ci@falconstor.com
+        from: openstack-ci@falconstor.com
+        subject: 'CI job PASSED for {change.project} {change.number},{change.patchset}'
     failure:
       gerrit:
         # Change this value to -1 to enable failure votes
         verified: 0
+      smtp:
+        to: openstack-ci@falconstor.com
+        from: openstack-ci@falconstor.com
+        subject: 'CI job FAILED for {change.project} {change.number},{change.patchset}'
 
   - name: silent
     description: CI in testing mode. Results are emailed but not publicly posted to Gerrit.
