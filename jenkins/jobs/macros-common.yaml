@@ -64,7 +64,7 @@
           echo "Triggered by: https://review.openstack.org/$ZUUL_CHANGE patchset $ZUUL_PATCHSET"
 
           # TODO: Update this link to point to your log server
-          echo "Detailed logs: http://openstack.falconstor.com/$BUILD_ID/"
+          echo "Detailed logs: http://openstack.falconstor.com/$LOG_PATH/"
 #
 # Upload logs after job finishes
 #
@@ -74,7 +74,7 @@
       - scp:
           site: 'LogServer'
           files:
-            - target: 'logs/$BUILD_ID'
+            - target: 'logs/$LOG_PATH'
               copy-console: true
               copy-after-failure: true
 #
@@ -86,7 +86,7 @@
       - scp:
           site: 'LogServer'
           files:
-            - target: 'logs/$BUILD_ID'
+            - target: 'logs/$LOG_PATH'
               source: 'logs/**'
               keep-hierarchy: true
               copy-after-failure: true
