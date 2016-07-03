@@ -65,7 +65,7 @@ pipelines:
     manager: IndependentPipelineManager
     trigger:
       gerrit:
-        - event: patchest-created
+        - event: patchset-created
         - event: change-restored
         # recheck trigger that runs the check pipeline jobs when someone
         # adds a comment to a review that says "run-FalconStor".
@@ -93,7 +93,7 @@ pipelines:
     manager: IndependentPipelineManager
     trigger:
       gerrit:
-        - event: patchest-created
+        - event: patchset-created
         - event: change-restored
         # recheck trigger that runs the check pipeline jobs when someone
         # adds a comment to a review that says "run-FalconStor".
