@@ -20,6 +20,12 @@ labels:
     min-ready: 2
     providers:
       - name: ci-opstack01
+  - name: dsvm2-slave
+    image: dpc
+    ready-script: invoke-fc-passthrough.sh
+    min-ready: 2
+    providers:
+      - name: ci-opstack02
 
 diskimages:
     - name: dpc
@@ -55,6 +61,24 @@ providers:
         diskimage: dpc
         username: jenkins
         private-key: '/home/nodepool/.ssh/id_rsa'
-
+  - name: ci-opstack02
+    username: 'admin'
+    password: 'openstack'
+    auth-url: 'http://192.168.2.70:5000/v2.0'
+    project-name: 'admin'
+    max-servers: 2
+    boot-timeout: 1200
+    launch-timeout: 3600
+    keypair: 'jenkins'
+    pool: 'external'
+    networks:
+      #TODO: Enter the ID of the "internal" network on the provider
+      - net-id: 'cb305e9f-9028-44a6-b086-021e67a1d241'
+    images:
+      - name: dpc
+        min-ram: 8192
+        diskimage: dpc
+        username: jenkins
+        private-key: '/home/nodepool/.ssh/id_rsa'
 targets:
   - name: jenkins1

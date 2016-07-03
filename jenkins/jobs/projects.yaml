@@ -7,14 +7,16 @@
 #
 - project:
     name: 'ci-sandbox'
-    node: 'dsvm-slave'
     jobs:
         - 'dsvm-{name}-fss-iscsi'
         - 'dsvm-{name}-fss-iscsi-custom'
+        - 'dsvm-{name}-fss-fc'
+        - 'dsvm-{name}-fss-fc-custom'
 
 - project:
     name: 'cinder'
-    node: 'dsvm-slave'
     jobs:
         - 'dsvm-{name}-fss-iscsi'
         - 'dsvm-{name}-fss-iscsi-custom'
+        - 'dsvm-{name}-fss-fc'
+        - 'dsvm-{name}-fss-fc-custom'

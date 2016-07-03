@@ -4,7 +4,7 @@
 #
 - job-template:
     name: 'dsvm-{name}-fss-iscsi-custom'
-    node: '{node}'
+    node: dsvm-slave
 
     wrappers:
       - timeout:
@@ -17,6 +17,7 @@
       - link-logs
       - net-info
       - devstack-checkout
+      - set-iscsi-name
       - shell: |
           #!/bin/bash -xe
 
