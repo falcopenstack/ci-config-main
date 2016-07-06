@@ -17,7 +17,6 @@
       - link-logs
       - net-info
       - devstack-checkout
-      - set-iscsi-name
       - shell: |
           #!/bin/bash -xe
 
