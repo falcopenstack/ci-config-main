@@ -73,7 +73,7 @@ providers:
     pool: 'external'
     networks:
       #TODO: Enter the ID of the "internal" network on the provider
-      - net-id: 'cb305e9f-9028-44a6-b086-021e67a1d241'
+      - net-id: 'de06eedf-4057-4d75-9db3-16e5e255fd94'
     images:
       - name: dpc
         min-ram: 8192
