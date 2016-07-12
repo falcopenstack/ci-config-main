@@ -17,13 +17,13 @@ labels:
   - name: dsvm-slave
     image: dpc
     ready-script: set_iscsi_name.sh
-    min-ready: 2
+    min-ready: 1
     providers:
       - name: ci-opstack01
   - name: dsvm2-slave
     image: dpc
-    ready-script: invoke-fc-passthrough.sh
-    min-ready: 2
+    ready-script: invoke_fc_passthrough.sh
+    min-ready: 1
     providers:
       - name: ci-opstack02
 
@@ -47,7 +47,7 @@ providers:
     password: 'openstack'
     auth-url: 'http://192.168.2.50:5000/v2.0'
     project-name: 'admin'
-    max-servers: 2
+    max-servers: 1
     boot-timeout: 1200
     launch-timeout: 3600
     keypair: 'jenkins'
@@ -66,14 +66,14 @@ providers:
     password: 'openstack'
     auth-url: 'http://192.168.2.70:5000/v2.0'
     project-name: 'admin'
-    max-servers: 2
+    max-servers: 1
     boot-timeout: 1200
     launch-timeout: 3600
     keypair: 'jenkins'
     pool: 'external'
     networks:
       #TODO: Enter the ID of the "internal" network on the provider
-      - net-id: 'de06eedf-4057-4d75-9db3-16e5e255fd94'
+      - net-id: '3341208a-8900-47de-9455-1f81c3b87cbe'
     images:
       - name: dpc
         min-ram: 8192
