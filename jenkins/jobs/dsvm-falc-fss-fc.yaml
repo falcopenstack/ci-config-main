@@ -30,7 +30,7 @@
           enabled_backends=FSS-FC
           default_volume_type=FSSFCDriver
 
-          [FSS]
+          [FSS-FC]
           volume_driver=cinder.volume.drivers.falconstor.fc.FSSFCDriver
           volume_backend_name=FSSFCDriver
           # TODO Update these values if the FSS being used for CI changes
