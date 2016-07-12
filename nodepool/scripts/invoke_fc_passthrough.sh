@@ -2,6 +2,7 @@
 
 # Copyright (C) 2015 Hewlett-Packard Development Company, L.P.
 # Copyright (C) 2015 Pure Storage, Inc.
+# Copyright (C) 2016 FalconStor Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,6 +35,14 @@
 # export FC_PROVIDER_USER=root
 # export FC_PROVIDER_KEY=/opt/nodepool-scripts/passthrough
 # export FC_PROVIDER_RC=/root/keystonerc_jenkins
+#
+# The maximum number of FC devices to passthrough, failing if they cannot all be
+# aquired
+# export FC_NUM=2 (default 1)
+#
+# For single node setups where the hypervisor is the same as the provider, and dns
+# is not configured, export this variable to use the provider ip as the hypervisor
+# export FC_SINGLE_NODE=1
 
 HOSTNAME=$1
 
@@ -60,20 +69,21 @@ sudo service open-iscsi restart
 # FC Passthrough setup starts here
 #
 echo "Export FC_PROVIDER env variable"
- export FC_PROVIDER=192.168.2.70
- export FC_PROVIDER_USER=root
- export FC_PROVIDER_KEY=/opt/nodepool-scripts/passthrough
- export FC_PROVIDER_RC=/root/keystonerc_admin
-#
-# For single node setups where the hypervisor is the same as the provider, and dns
-# is not configured, export this variable to use the provider ip as the hypervisor
- export FC_SINGLE_NODE=1
-# /opt/nodepool-scripts/invoke-fc-passthrough.sh
+export FC_PROVIDER=192.168.2.70
+export FC_PROVIDER_USER=root
+export FC_PROVIDER_KEY=/opt/nodepool-scripts/passthrough
+export FC_PROVIDER_RC=/root/keystonerc_admin
+
+export FC_SINGLE_NODE=1
+ 
+FC_NUM=${FC_NUM:-1}
+FC_PCI_VAR_NAME=${FC_PCI_VAR_NAME:-"fc_pci_device"}
+
+echo "Planning to passthrough $FC_NUM pci devices"
 
 eth0_ip=$(hostname  -I | cut -f1 -d' ')
 
 PROVIDER=${FC_PROVIDER}
-echo "FC_PROVIDER(PROVIDER) = $PROVIDER"
 if [[ -z $PROVIDER ]]; then
     eth0_ip_base=$(echo $eth0_ip | cut -f1,2,3 -d.)
     PROVIDER="${eth0_ip_base}.1"
@@ -111,7 +121,6 @@ nova_results=$?
 # Get our Virsh name
 VIRSH_NAME=$(echo "$NOVA_DETAILS" | grep instance_name | cut -d \| -f 3 | tr -d '[:space:]')
 virsh_result=$?
-echo "VIRSH_NAME is $VIRSH_NAME"
 echo "VIRSH_NAME result: $virsh_result"
 if [[ $nova_result -ne 0 || $virsh_result -ne 0 || -z "$VIRSH_NAME" ]]; then
     echo "Unable to get Virsh Name. Aborting. Debug info:"
@@ -142,7 +151,8 @@ else
 fi
 echo "Found Hypervisor hostname: $HYPERVISOR"
 
-fc_pci_device=$(ssh -i $PROVIDER_KEY $PROVIDER_USER@$HYPERVISOR 'echo $fc_pci_device')
+fc_pci_device_cmd="echo \$$FC_PCI_VAR_NAME"
+fc_pci_device=$(ssh -i $PROVIDER_KEY $PROVIDER_USER@$HYPERVISOR "$fc_pci_device_cmd")
 
 if [[ -z $fc_pci_device ]]; then
     echo "No FC device known. Set fc_pci_device in your /etc/profile.d or /etc/environment (depending on distro and ssh configuration) to the desired 'Class Device path', e.g. '0000:21:00.2'"
@@ -151,57 +161,83 @@ fi
 
 echo "Found pci devices: $fc_pci_device"
 
+function is_device_online() {
+   fc_device=$1
+   # If a device is not "Online" we'll get an empty
+   # string as a result of the following command.
+   cmd="systool -c fc_host -v"
+   OUTPUT=$(ssh -i $PROVIDER_KEY $PROVIDER_USER@$HYPERVISOR "systool -c fc_host -v")
+   test_fc_online="systool -c fc_host -v | grep -B12 'Online' | grep 'Class Device path' | grep '$fc_device'"
+   ONLINE=$(ssh -i $PROVIDER_KEY $PROVIDER_USER@$HYPERVISOR "$test_fc_online")
+   echo "online result='$ONLINE'"
+   if [ -z "$ONLINE" ]; then
+       return 0;
+   else
+       return 1;
+   fi
+}
+
 exit_code=1
 errexit=$(set +o | grep errexit)
-#Ignore errors
+# Ignore errors
 set +e
-i=0
-#dettach all the device in provider first
+let num_attached=0
 for pci in $fc_pci_device; do
-    echo $pci
+    echo "Trying passthrough for $pci"
+
     BUS=$(echo $pci | cut -d : -f2)
     SLOT=$(echo $pci | cut -d : -f3 | cut -d . -f1)
     FUNCTION=$(echo $pci | cut -d : -f3 | cut -d . -f2)
     XML="<hostdev mode='subsystem' type='pci' managed='yes'><source><address domain='0x0000' bus='0x$BUS' slot='0x$SLOT' function='0x$FUNCTION'/></source></hostdev>"
     echo $XML
-    fcoe[$i]=`mktemp --suffix=_fcoe.xml`
-    echo $XML > ${fcoe[$i]}
+    fcoe=`mktemp --suffix=_fcoe.xml`
+    echo $XML > $fcoe
 
-    scp -i $PROVIDER_KEY ${fcoe[$i]} $PROVIDER_USER@$HYPERVISOR:/tmp/
+    fc_virsh_device="pci_0000_${BUS}_${SLOT}_${FUNCTION}"
+
+    scp -i $PROVIDER_KEY $fcoe $PROVIDER_USER@$HYPERVISOR:/tmp/
 
     # Run passthrough and clean up.
     # TODO: At the point where we can do more than one node on a provider we
     # will need to do this cleanup at the end of the job and not *before* attaching
     # since we won't know which ones are still in use
     echo $(sudo lspci | grep -i fib)
-    ssh -i $PROVIDER_KEY $PROVIDER_USER@$HYPERVISOR "virsh nodedev-dettach pci_0000_${BUS}_${SLOT}_${FUNCTION}"
+    ssh -i $PROVIDER_KEY $PROVIDER_USER@$HYPERVISOR "virsh nodedev-dettach $fc_virsh_device"
 
     detach_result=$?
-    let i+=1
     echo "Detach result: $detach_result"
     if [[ $detach_result -ne 0 ]]; then
-        echo "Detach failed. Trying next device..."
+        echo "Detach failed ($detach_result). Trying next device..."
         continue
     fi
-done
-$errexit
-#Attach all the devices for passthrough
-for f in "${fcoe[@]}"; do
+
     echo $(sudo lspci | grep -i fib)
-    ssh -i $PROVIDER_KEY $PROVIDER_USER@$HYPERVISOR "virsh attach-device $VIRSH_NAME $f"
+    ssh -i $PROVIDER_KEY $PROVIDER_USER@$HYPERVISOR "virsh attach-device $VIRSH_NAME $fcoe"
     attach_result=$?
     echo "Attach result: $attach_result"
     if [[ $attach_result -eq 0 ]]; then
         echo "Attached succeed. Trying next device..."
+        (( num_attached += 1 ))
         exit_code=0
     fi
     echo $(sudo lspci | grep -i fib)
+    echo $num_attached
+    if [[ $num_attached -eq $FC_NUM ]]; then
+        echo "Attached $num_attached devices. Stopping"
+        break
+    fi
+
 done
 $errexit
 
 if [[ $exit_code -ne 0 ]]; then
     echo "FC Passthrough failed. Aborting."
     exit $exit_code
+fi
+
+if [[ $num_attached -ne $FC_NUM ]]; then
+    echo "FC requested $FC_NUM, but only attached $num_attached. Aborting."
+    exit 1
 fi
 
 # Make sure that really it worked...
@@ -215,9 +251,11 @@ sudo systool -c fc_host -v
 echo $?
 
 echo $(sudo lspci | grep -i fib)
-
+sleep 5
 device_path=$(sudo systool -c fc_host -v | grep "Device path")
-if [[ ${device_path}  -eq 0 ]]; then
+echo $device_path
+if [[ ${#device_path}  -eq 0 ]]; then
     echo "Failed to install FC Drivers. Aborting."
     exit 1
 fi
+
