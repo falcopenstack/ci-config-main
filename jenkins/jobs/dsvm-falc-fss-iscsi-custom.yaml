@@ -62,9 +62,11 @@
           mkdir falconstor
           chmod 0755 falconstor
           cd $BASE/new/cinder/cinder/volume/drivers/falconstor
-          wget https://raw.githubusercontent.com/falcopenstack/cinderdriver/master/cinder/volume/drivers/falconstor/__init__.py
-          wget https://raw.githubusercontent.com/falcopenstack/cinderdriver/master/cinder/volume/drivers/falconstor/iscsi.py
-          wget https://raw.githubusercontent.com/falcopenstack/cinderdriver/master/cinder/volume/drivers/falconstor/rest_proxy.py
+          wget https://raw.githubusercontent.com/chongkim712/cinderdriver/master/cinder/volume/drivers/falconstor/__init__.py
+          wget https://raw.githubusercontent.com/chongkim712/cinderdriver/master/cinder/volume/drivers/falconstor/iscsi.py
+          wget https://raw.githubusercontent.com/chongkim712/cinderdriver/master/cinder/volume/drivers/falconstor/rest_proxy.py
+          wget https://raw.githubusercontent.com/chongkim712/cinderdriver/master/cinder/volume/drivers/falconstor/fss_common.py
+          wget https://raw.githubusercontent.com/chongkim712/cinderdriver/master/cinder/volume/drivers/falconstor/fc.py
           chmod 0644 *.py
 
           }}
