@@ -17,15 +17,15 @@ labels:
   - name: dsvm-slave
     image: dpc
     ready-script: set_iscsi_name.sh
-    min-ready: 1
+    min-ready: 2
     providers:
       - name: ci-opstack01
   - name: dsvm2-slave
     image: dpc
     ready-script: invoke-fc-passthrough.sh
-    min-ready: 1
+    min-ready: 2
     providers:
-      - name: ci-opstack03
+      - name: ci-opstack02
 
 diskimages:
     - name: dpc
@@ -47,7 +47,7 @@ providers:
     password: 'openstack'
     auth-url: 'http://192.168.2.50:5000/v2.0'
     project-name: 'admin'
-    max-servers: 1
+    max-servers: 2
     boot-timeout: 1200
     launch-timeout: 3600
     keypair: 'jenkins'
@@ -66,7 +66,7 @@ providers:
     password: 'openstack'
     auth-url: 'http://192.168.2.70:5000/v2.0'
     project-name: 'admin'
-    max-servers: 0
+    max-servers: 2
     boot-timeout: 1200
     launch-timeout: 3600
     keypair: 'jenkins'
@@ -74,25 +74,6 @@ providers:
     networks:
       #TODO: Enter the ID of the "internal" network on the provider
       - net-id: 'de06eedf-4057-4d75-9db3-16e5e255fd94'
-    images:
-      - name: dpc
-        min-ram: 8192
-        diskimage: dpc
-        username: jenkins
-        private-key: '/home/nodepool/.ssh/id_rsa'
-  - name: ci-opstack03
-    username: 'admin'
-    password: 'openstack'
-    auth-url: 'http://192.168.2.90:5000/v2.0'
-    project-name: 'admin'
-    max-servers: 1
-    boot-timeout: 1200
-    launch-timeout: 3600
-    keypair: 'jenkins'
-    pool: 'external'
-    networks:
-      #TODO: Enter the ID of the "internal" network on the provider
-      - net-id: '7080513a-5cc5-482d-8b05-76d4f570767e'
     images:
       - name: dpc
         min-ram: 8192
