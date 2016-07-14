@@ -26,7 +26,10 @@ NODEPOOL_MIRROR_HOST=$(echo $NODEPOOL_MIRROR_HOST|tr '[:upper:]' '[:lower:]')
 NODEPOOL_PYPI_MIRROR=${NODEPOOL_PYPI_MIRROR:-http://$NODEPOOL_MIRROR_HOST/pypi/simple}
 NODEPOOL_WHEEL_MIRROR=${NODEPOOL_WHEEL_MIRROR:-http://$NODEPOOL_MIRROR_HOST/wheel/$AFS_SLUG}
 NODEPOOL_UBUNTU_MIRROR=${NODEPOOL_UBUNTU_MIRROR:-http://$NODEPOOL_MIRROR_HOST/ubuntu}
+NODEPOOL_CENTOS_MIRROR=${NODEPOOL_CENTOS_MIRROR:-http://$NODEPOOL_MIRROR_HOST/centos}
+NODEPOOL_EPEL_MIRROR=${NODEPOOL_EPEL_MIRROR:-http://$NODEPOOL_MIRROR_HOST/epel}
 NODEPOOL_CEPH_MIRROR=${NODEPOOL_CEPH_MIRROR:-http://$NODEPOOL_MIRROR_HOST/ceph-deb-hammer}
+NODEPOOL_UCA_MIRROR=${NODEPOOL_UCA_MIRROR:-http://$NODEPOOL_MIRROR_HOST/ubuntu-cloud-archive}
 NODEPOOL_NPM_MIRROR=${NODEPOOL_NPM_MIRROR:-http://$NODEPOOL_MIRROR_HOST/npm/}
 
 cat >/tmp/pip.conf <<EOF
@@ -64,23 +67,22 @@ LSBDISTCODENAME=$(lsb_release -cs)
 # NOTE(pabelanger): We don't actually have mirrors for ubuntu-precise, so skip
 # them.
 if [ "$LSBDISTID" == "Ubuntu" ] && [ "$LSBDISTCODENAME" != 'precise' ]; then
-    # NOTE(pabelanger): We only have a xenial mirror ATM because reprepro cannot
-    # mirror repositories with 0 packages. Once our reprepro mirrors is 100% we
-    # can remove this logic check. We are only missing -backports on the mirrors
-    if [ "$LSBDISTCODENAME" == "xenial" ] ; then
-        sudo dd of=/etc/apt/sources.list <<EOF
-deb $NODEPOOL_UBUNTU_MIRROR $LSBDISTCODENAME main universe
-deb $NODEPOOL_UBUNTU_MIRROR $LSBDISTCODENAME-updates main universe
-deb $NODEPOOL_UBUNTU_MIRROR $LSBDISTCODENAME-security main universe
-EOF
-    else
         sudo dd of=/etc/apt/sources.list <<EOF
 deb $NODEPOOL_UBUNTU_MIRROR $LSBDISTCODENAME main universe
 deb $NODEPOOL_UBUNTU_MIRROR $LSBDISTCODENAME-updates main universe
 deb $NODEPOOL_UBUNTU_MIRROR $LSBDISTCODENAME-backports main universe
 deb $NODEPOOL_UBUNTU_MIRROR $LSBDISTCODENAME-security main universe
 EOF
-    fi
+    # Opt in repos. Jobs that want to take advantage of them can copy or
+    # symlink them into /etc/apt/sources.list.d/
+    sudo mkdir -p /etc/apt/sources.list.available.d
+    sudo dd of=/etc/apt/sources.list.available.d/ceph-deb-hammer.list <<EOF
+deb $NODEPOOL_CEPH_MIRROR $LSBDISTCODENAME main
+EOF
+    sudo dd of=/etc/apt/sources.list.available.d/ubuntu-cloud-archive.list <<EOF
+deb $NODEPOOL_UCA_MIRROR $LSBDISTCODENAME-updates main
+EOF
+    # Keep this for backward compat until devstack ceph plugin is updated
     sudo dd of=/etc/apt/sources.list.d/ceph-deb-hammer.list <<EOF
 deb $NODEPOOL_CEPH_MIRROR $LSBDISTCODENAME main
 EOF
@@ -111,32 +113,33 @@ elif [ "$LSBDISTID" == "CentOS" ]; then
     sudo dd of=/etc/yum.repos.d/CentOS-Base.repo <<EOF
 [base]
 name=CentOS-\$releasever - Base
-baseurl=http://$NODEPOOL_MIRROR_HOST/centos/\$releasever/os/\$basearch/
+baseurl=$NODEPOOL_CENTOS_MIRROR/\$releasever/os/\$basearch/
 gpgcheck=1
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-\$releasever
 
 #released updates
 [updates]
 name=CentOS-\$releasever - Updates
-baseurl=http://$NODEPOOL_MIRROR_HOST/centos/\$releasever/updates/\$basearch/
+baseurl=$NODEPOOL_CENTOS_MIRROR/\$releasever/updates/\$basearch/
 gpgcheck=1
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-\$releasever
 
 #additional packages that may be useful
 [extras]
 name=CentOS-\$releasever - Extras
-baseurl=http://$NODEPOOL_MIRROR_HOST/centos/\$releasever/extras/\$basearch/
+baseurl=$NODEPOOL_CENTOS_MIRROR/\$releasever/extras/\$basearch/
 gpgcheck=1
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-\$releasever
 EOF
 
     sudo dd of=/etc/yum.repos.d/epel.repo <<EOF
 [epel]
-name=Extra Packages for Enterprise Linux 7 - \$basearch
-baseurl=http://$NODEPOOL_MIRROR_HOST/epel/7/\$basearch
+name=Extra Packages for Enterprise Linux \$releasever - \$basearch
+baseurl=$NODEPOOL_EPEL_MIRROR/\$releasever/\$basearch
 failovermethod=priority
 enabled=1
 gpgcheck=1
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-\$releasever
 EOF
 fi
+
