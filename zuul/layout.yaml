@@ -10,6 +10,7 @@ projects:
     silent:
       # Job name
       - dsvm-cinder-fss-iscsi-custom
+      - dsvm-cinder-fss-fc-custom
 
 #
 # Modify the three values above based on the following:
