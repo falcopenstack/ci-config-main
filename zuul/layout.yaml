@@ -114,8 +114,8 @@ pipelines:
       smtp:
         to: chong.kim@falconstor.com
         from: openstack-ci@falconstor.com
-        subject: 'CI Zuul DISABLED for 5 consecutive failures'
-    disable-after-consecutive-failures: 5
+        subject: 'CI Zuul DISABLED for 20 consecutive failures'
+    disable-after-consecutive-failures: 20
 
   - name: silent
     description: CI in testing mode. Results are emailed but not publicly posted to Gerrit.
