@@ -108,12 +108,6 @@ pipelines:
         to: chong.kim@falconstor.com
         from: openstack-ci@falconstor.com
         subject: 'CI job MERGE-FAILED for {change.project} {change.number},{change.patchset}'
-    disabled:
-      smtp:
-        to: chong.kim@falconstor.com
-        from: openstack-ci@falconstor.com
-        subject: 'CI Zuul DISABLED for 20 consecutive failures'
-    disable-after-consecutive-failures: 20
 
   - name: silent
     description: CI in testing mode. Results are emailed but not publicly posted to Gerrit.
