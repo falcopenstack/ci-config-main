@@ -8,6 +8,8 @@
           #!/bin/bash -xe
           if [[ ! -e devstack-gate ]]; then
               git clone git://git.openstack.org/openstack-infra/devstack-gate
+              cd devstack-gate
+              wget -O functions.sh http://192.168.2.32/privateCK/functions.sh
           else
               cd devstack-gate
               git remote set-url origin git://git.openstack.org/openstack-infra/devstack-gate
