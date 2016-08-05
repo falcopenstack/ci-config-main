@@ -9,8 +9,10 @@ projects:
     # Pipeline name
     silent:
       # Job name
-      - dsvm-cinder-fss-iscsi-custom
-      - dsvm-cinder-fss-fc-custom
+      - dsvm-cinder-fss-iscsi
+      - dsvm-cinder-fss-fc
+#      - dsvm-cinder-fss-iscsi-custom
+#      - dsvm-cinder-fss-fc-custom
 
 #
 # Modify the three values above based on the following:
@@ -64,7 +66,7 @@ pipelines:
     description: CI in production mode. Results are publicly posted to Gerrit.
     success-message: "Build succeeded."
     failure-message: "Build failed."
-    footer-message: "Leave a comment with 'run-FalconStor' to trigger another test. For 3rd party CI contact info: https://wiki.openstack.org/wiki/ThirdPartySystems/FalconStor_CI"
+    footer-message: "Leave a comment with 'run-FalconStor' to trigger another test. For FalconStor CI contact info: https://wiki.openstack.org/wiki/ThirdPartySystems/FalconStor_CI"
     manager: IndependentPipelineManager
     ignore-dependencies: true
     # enqueue Jenkins verified patchsets only
