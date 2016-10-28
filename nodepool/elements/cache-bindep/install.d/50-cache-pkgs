@@ -26,19 +26,22 @@ FALLBACKREPO=/opt/git/openstack-infra/project-config
 FALLBACKFILE=jenkins/data/bindep-fallback.txt
 PACKAGES=`git --git-dir=$FALLBACKREPO/.git show master:$FALLBACKFILE`
 
-# NOTE(pabelanger): We currently don't gate on other-requirements.txt
+# NOTE(pabelanger): We currently don't gate on bindep.txt/other-requirements.txt
 # for centos and fedora nodes. As such, we have no way to ensure this will
 # not break DIB process. So we only run this for ubuntu-trusty.
+# bindep.txt is new filename, other-requirements.txt is the old one. We should
+# handle both for now.
 if [ -f /usr/bin/apt-get ] ; then
-    REQSFILE=other-requirements.txt
     for REPO in /opt/git/*/* ; do
         BRANCHES=`git --git-dir=$REPO/.git branch -r | grep '^  origin/[^H]'`
         for BRANCH in $BRANCHES ; do
-            REQS=`git --git-dir=$REPO/.git show $BRANCH:$REQSFILE 2>/dev/null \
-                || true`
-            if [ -n "$REQS" ] ; then
-                PACKAGES=`echo -e "$PACKAGES\n$REQS" | sort -u`
-            fi
+            for reqsfile in bindep.txt other-requirements.txt ; do
+                REQS=`git --git-dir=$REPO/.git show $BRANCH:$reqsfile 2>/dev/null \
+                    || true`
+                if [ -n "$REQS" ] ; then
+                    PACKAGES=`echo -e "$PACKAGES\n$REQS" | sort -u`
+                fi
+            done
         done
     done
 fi
@@ -48,6 +51,17 @@ PACKAGELIST=`echo "$PACKAGES" | /usr/bindep-env/bin/bindep -b -f - || true`
 if [ -f /usr/bin/apt-get ] ; then
     # --ignore-missing conflicts with set -e, so force it to be ok
     apt-get -y --ignore-missing -d install $PACKAGELIST || true
+elif [ -f /usr/bin/emerge ] ; then
+    # write out use config (won't install/fetch without it)
+    # This lays down install / compile time options needed for bindep to
+    # install / fetch the needed packages.
+    USE_FILE=/etc/portage/package.use/bindep.use
+    cat > $USE_FILE <<EOF
+x11-libs/cairo X
+x11-libs/gdk-pixbuf X
+media-libs/gd truetype png fontconfig jpeg
+EOF
+    emerge -q --fetchonly $PACKAGELIST || true
 else
     ${YUM:-yum} install -y --downloadonly $PACKAGELIST
 fi
