@@ -39,9 +39,10 @@
           san_ip=192.168.2.42
           fss_pool=1
 
-          # Use post-extra because the tempest configuration file is
+          # Use test-config because the tempest configuration file is
           # overwritten with the .sample after post-config.
-          [[post-extra|\$TEMPEST_CONFIG]]
+          # (https://bugs.launchpad.net/devstack/+bug/1646391)
+          [[test-config|\$TEMPEST_CONFIG]]
           [volume]
           storage_protocol=FC
           vendor_name=FalconStor
