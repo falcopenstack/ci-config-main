@@ -58,6 +58,7 @@ NODEPOOL_UBUNTU_MIRROR=${NODEPOOL_UBUNTU_MIRROR:-http://$NODEPOOL_MIRROR_HOST/ub
 NODEPOOL_CENTOS_MIRROR=${NODEPOOL_CENTOS_MIRROR:-http://$NODEPOOL_MIRROR_HOST/centos}
 NODEPOOL_DEBIAN_OPENSTACK_MIRROR=${NODEPOOL_DEBIAN_OPENSTACK_MIRROR:-http://$NODEPOOL_MIRROR_HOST/debian-openstack}
 NODEPOOL_EPEL_MIRROR=${NODEPOOL_EPEL_MIRROR:-http://$NODEPOOL_MIRROR_HOST/epel}
+NODEPOOL_FEDORA_MIRROR=${NODEPOOL_FEDORA_MIRROR:-http://$NODEPOOL_MIRROR_HOST/fedora}
 NODEPOOL_CEPH_MIRROR=${NODEPOOL_CEPH_MIRROR:-http://$NODEPOOL_MIRROR_HOST/ceph-deb-hammer}
 NODEPOOL_UCA_MIRROR=${NODEPOOL_UCA_MIRROR:-http://$NODEPOOL_MIRROR_HOST/ubuntu-cloud-archive}
 NODEPOOL_NPM_MIRROR=${NODEPOOL_NPM_MIRROR:-http://$NODEPOOL_MIRROR_HOST/npm/}
@@ -90,7 +91,9 @@ deb $NODEPOOL_UBUNTU_MIRROR $LSBDISTCODENAME-security main universe"
 
 CEPH_SOURCES_LIST="deb $NODEPOOL_CEPH_MIRROR $LSBDISTCODENAME main"
 
-UCA_SOURCES_LIST="deb $NODEPOOL_UCA_MIRROR $LSBDISTCODENAME-updates main"
+UCA_SOURCES_LIST_LIBERTY="deb $NODEPOOL_UCA_MIRROR trusty-updates/liberty main"
+UCA_SOURCES_LIST_MITAKA="deb $NODEPOOL_UCA_MIRROR trusty-updates/mitaka main"
+UCA_SOURCES_LIST_NEWTON="deb $NODEPOOL_UCA_MIRROR xenial-updates/newton main"
 
 APT_CONF_UNAUTHENTICATED="APT::Get::AllowUnauthenticated \"true\";"
 
@@ -113,6 +116,28 @@ deb-src $NODEPOOL_DEBIAN_MIRROR $LSBDISTCODENAME-security main"
 DEBIAN_OPENSTACK_NEWTON_SOURCES_LIST="\
 deb $NODEPOOL_DEBIAN_OPENSTACK_MIRROR $LSBDISTCODENAME-newton main
 deb $NODEPOOL_DEBIAN_OPENSTACK_MIRROR $LSBDISTCODENAME-newton-backports main"
+
+YUM_REPOS_FEDORA="\
+[fedora]
+name=Fedora \$releasever - \$basearch
+failovermethod=priority
+baseurl=$NODEPOOL_FEDORA_MIRROR/releases/\$releasever/Everything/\$basearch/os/
+enabled=1
+metadata_expire=7d
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-\$releasever-\$basearch
+skip_if_unavailable=False"
+
+YUM_REPOS_FEDORA_UPDATES="\
+[updates]
+name=Fedora \$releasever - \$basearch - Updates
+failovermethod=priority
+baseurl=$NODEPOOL_FEDORA_MIRROR/updates/\$releasever/\$basearch/
+enabled=1
+gpgcheck=1
+metadata_expire=6h
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-\$releasever-\$basearch
+skip_if_unavailable=False"
 
 YUM_REPOS_CENTOS_BASE="\
 [base]
@@ -150,11 +175,21 @@ sudo mv /tmp/pip.conf /etc/
 sudo chown root:root /etc/pip.conf
 sudo chmod 0644 /etc/pip.conf
 
+# NOTE(pabelanger): We can remove the jenkins user once we have migrated
+# nl01.o.o to production
 # Write jenkins user distutils/setuptools configuration used by easy_install
-echo "$PYDISTUTILS_CFG" >/home/jenkins/.pydistutils.cfg
-
+echo "$PYDISTUTILS_CFG" | sudo tee /home/jenkins/.pydistutils.cfg
+sudo chown jenkins:jenkins /home/jenkins/.pydistutils.cfg
 # Write jenkins user npm configuration
-echo "$NPMRC" >/home/jenkins/.npmrc
+echo "$NPMRC" | sudo tee /home/jenkins/.npmrc
+sudo chown jenkins:jenkins /home/jenkins/.npmrc
+
+# Write zuul user distutils/setuptools configuration used by easy_install
+echo "$PYDISTUTILS_CFG" | sudo tee /home/zuul/.pydistutils.cfg
+sudo chown zuul:zuul /home/zuul/.pydistutils.cfg
+# Write zuul user npm configuration
+echo "$NPMRC" | sudo tee /home/zuul/.npmrc
+sudo chown zuul:zuul /home/zuul/.npmrc
 
 # NOTE(pabelanger): We don't actually have mirrors for ubuntu-precise, so skip
 # them.
@@ -173,8 +208,14 @@ if [ "$LSBDISTID" == "Ubuntu" ] && [ "$LSBDISTCODENAME" != 'precise' ]; then
     sudo mv /tmp/ceph-deb-hammer.list /etc/apt/sources.list.available.d/
 
     # Ubuntu Cloud Archive
-    echo "$UCA_SOURCES_LIST" >/tmp/ubuntu-cloud-archive.list
-    sudo mv /tmp/ubuntu-cloud-archive.list /etc/apt/sources.list.available.d/
+    echo "$UCA_SOURCES_LIST_LIBERTY" >/tmp/ubuntu-cloud-archive-liberty.list
+    sudo mv /tmp/ubuntu-cloud-archive-liberty.list /etc/apt/sources.list.available.d/
+
+    echo "$UCA_SOURCES_LIST_MITAKA" >/tmp/ubuntu-cloud-archive-mitaka.list
+    sudo mv /tmp/ubuntu-cloud-archive-mitaka.list /etc/apt/sources.list.available.d/
+
+    echo "$UCA_SOURCES_LIST_NEWTON" >/tmp/ubuntu-cloud-archive-newton.list
+    sudo mv /tmp/ubuntu-cloud-archive-newton.list /etc/apt/sources.list.available.d/
 
     sudo chown root:root /etc/apt/sources.list.available.d/*
     sudo chmod 0644 /etc/apt/sources.list.available.d/*
@@ -227,4 +268,11 @@ elif [ "$LSBDISTID" == "CentOS" ]; then
     sudo chown root:root /etc/yum.repos.d/*
     sudo chmod 0644 /etc/yum.repos.d/*
 
+elif [ "$LSBDISTID" == "Fedora" ]; then
+    echo "$YUM_REPOS_FEDORA" >/tmp/fedora.repo
+    sudo mv /tmp/fedora.repo /etc/yum.repos.d/
+    echo "$YUM_REPOS_FEDORA_UPDATES" >/tmp/fedora-updates.repo
+    sudo mv /tmp/fedora-updates.repo /etc/yum.repos.d/
+    sudo chown root:root /etc/yum.repos.d/*
+    sudo chmod 0644 /etc/yum.repos.d/*
 fi
