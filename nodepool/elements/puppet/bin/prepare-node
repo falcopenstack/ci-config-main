@@ -60,6 +60,4 @@ fi
 set -e
 
 # Make sure resolv.conf settings don't break dib
-if [ -n "$NODEPOOL_STATIC_NAMESERVER_V4" ] ; then
-    echo "nameserver $NODEPOOL_STATIC_NAMESERVER_V4"> /etc/resolv.conf
-fi
+echo "nameserver $NODEPOOL_STATIC_NAMESERVER_V4"> /etc/resolv.conf

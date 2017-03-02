@@ -14,45 +14,21 @@ gearman-servers:
   - host: 127.0.0.1
 
 labels:
-#  - name: dsvm-slave
-#    image: dpc
-#    ready-script: set_iscsi_name.sh
-#    min-ready: 1
-#    providers:
-#      - name: ci-opstack01
-#  - name: dsvm2-slave
-#    image: dpc
-#    ready-script: invoke_fc_passthrough.sh
-#    min-ready: 1
-#    providers:
-#      - name: ci-opstack02
-  - name: dsvm-xenial-slave
-    image: dpc-xenial
+  - name: dsvm-slave
+    image: dpc
     ready-script: set_iscsi_name.sh
     min-ready: 1
     providers:
       - name: ci-opstack01
-  - name: dsvm2-xenial-slave
-    image: dpc-xenial
+  - name: dsvm2-slave
+    image: dpc
     ready-script: invoke_fc_passthrough.sh
     min-ready: 1
     providers:
       - name: ci-opstack02
 
 diskimages:
-#    - name: dpc
-#      elements:
-#        - ubuntu
-#        - vm
-#        - openstack-repos
-#        - puppet
-#        - nodepool-base
-#        - node-devstack
-#      release: trusty
-#      env-vars:
-#        TMPDIR: /opt/dib_tmp
-#        DIB_IMAGE_CACHE: /opt/dib_cache
-    - name: dpc-xenial
+    - name: dpc
       elements:
         - ubuntu
         - vm
@@ -60,10 +36,10 @@ diskimages:
         - puppet
         - nodepool-base
         - node-devstack
-      release: xenial
+      release: trusty
       env-vars:
-        TMPDIR: /opt/dib_tmp_xenial
-        DIB_IMAGE_CACHE: /opt/dib_cache_xenial
+        TMPDIR: /opt/dib_tmp
+        DIB_IMAGE_CACHE: /opt/dib_cache
 
 providers:
   - name: ci-opstack01
@@ -80,11 +56,9 @@ providers:
       #TODO: Enter the ID of the "internal" network on the provider
       - net-id: '207f564f-f036-4aab-97cf-8f34499ad9ca'
     images:
-#      - name: dpc
-      - name: dpc-xenial
+      - name: dpc
         min-ram: 8192
-#        diskimage: dpc
-        diskimage: dpc-xenial
+        diskimage: dpc
         username: jenkins
         private-key: '/home/nodepool/.ssh/id_rsa'
   - name: ci-opstack02
@@ -101,11 +75,9 @@ providers:
       #TODO: Enter the ID of the "internal" network on the provider
       - net-id: 'de06eedf-4057-4d75-9db3-16e5e255fd94'
     images:
-#      - name: dpc
-      - name: dpc-xenial
+      - name: dpc
         min-ram: 8192
-#        diskimage: dpc
-        diskimage: dpc-xenial
+        diskimage: dpc
         username: jenkins
         private-key: '/home/nodepool/.ssh/id_rsa'
 targets:

@@ -51,13 +51,11 @@
           backup=false
           EOF
 
-          echo "Configure localrc.tmp file to properly setup CINDER_ENABLED_BACKENDS"
-          cat <<EOF >>$BASE/new/devstack/localrc.tmp
+          echo "Configure localrc file to properly setup CINDER_ENABLED_BACKENDS"
+          cat <<EOF >>$BASE/new/devstack/localrc
           CINDER_ENABLED_BACKENDS=FSS:FSSISCSIDriver
           ATTACH_ENCRYPTED_VOLUME_AVAILABLE=False
           EOF
-
-          export DEVSTACK_LOCAL_CONFIG=$(< ${BASE}/new/devstack/localrc.tmp)
 
           }}
 
@@ -72,7 +70,8 @@
           export TEMPEST_CONCURRENCY=1
           export DEVSTACK_GATE_NEUTRON=1
           echo "Disable test_shelve_volume because it fails due to SSH timeout (Bug 1298472)"
-          export 'DEVSTACK_GATE_TEMPEST_REGEX=^(?=.*volume)(?!.*boto)(?!.*test_volume_boot_pattern)(?!.*test_minimum_basic_scenario)(?!.*test_shelve_volume)(?!.*test_volume_from_snapshot)(?!.*test_detach_volume_shelved_or_offload_server)(?!.*test_unmanage_manage_snapshot).*'
+          export 'DEVSTACK_GATE_TEMPEST_REGEX=^(?=.*volume)(?!.*boto)(?!.*test_volume_boot_pattern)(?!.*test_minimum_basic_scenario)(?!.*test_shelve_volume)(?!.*test_detach_volume_shelved_or_offload_server).*'
+
           export GIT_BASE="https://review.openstack.org/p"
 
           if [ -z $ZUUL_PROJECT ]; then

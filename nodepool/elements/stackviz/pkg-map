@@ -4,12 +4,6 @@
       "24": {
         "npm": ""
       }
-    },
-    "opensuse": {
-      "42.2": {
-        "nodejs": "nodejs4",
-        "npm": "npm4"
-      }
     }
   },
   "family": {
@@ -17,8 +11,7 @@
       "nodejs": "nodejs-legacy"
     },
     "suse": {
-      "nodejs": "nodejs6",
-      "npm": "npm6"
+      "npm": "nodejs-npm"
     }
   },
   "default": {
