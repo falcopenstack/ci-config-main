@@ -15,13 +15,13 @@ gearman-servers:
 
 labels:
   - name: dsvm-slave
-    image: dpc
+    image: dpc-xenial
     ready-script: set_iscsi_name.sh
     min-ready: 1
     providers:
       - name: ci-opstack01
   - name: dsvm2-slave
-    image: dpc
+    image: dpc-xenial
     ready-script: invoke_fc_passthrough.sh
     min-ready: 1
     providers:
@@ -58,7 +58,7 @@ providers:
     images:
       - name: dpc-xenial
         min-ram: 8192
-        diskimage: dpc
+        diskimage: dpc-xenial
         username: jenkins
         private-key: '/home/nodepool/.ssh/id_rsa'
   - name: ci-opstack02
