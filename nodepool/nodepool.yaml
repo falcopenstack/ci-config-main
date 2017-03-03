@@ -28,15 +28,15 @@ labels:
       - name: ci-opstack02
 
 diskimages:
-    - name: dpc
+    - name: dpc-xenial
       elements:
-        - ubuntu
+        - ubuntu-minimal
         - vm
         - openstack-repos
         - puppet
         - nodepool-base
         - node-devstack
-      release: trusty
+      release: xenial
       env-vars:
         TMPDIR: /opt/dib_tmp
         DIB_IMAGE_CACHE: /opt/dib_cache
@@ -56,7 +56,7 @@ providers:
       #TODO: Enter the ID of the "internal" network on the provider
       - net-id: '207f564f-f036-4aab-97cf-8f34499ad9ca'
     images:
-      - name: dpc
+      - name: dpc-xenial
         min-ram: 8192
         diskimage: dpc
         username: jenkins
@@ -75,9 +75,9 @@ providers:
       #TODO: Enter the ID of the "internal" network on the provider
       - net-id: 'de06eedf-4057-4d75-9db3-16e5e255fd94'
     images:
-      - name: dpc
+      - name: dpc-xenial
         min-ram: 8192
-        diskimage: dpc
+        diskimage: dpc-xenial
         username: jenkins
         private-key: '/home/nodepool/.ssh/id_rsa'
 targets:
