@@ -19,10 +19,10 @@ labels:
     ready-script: set_iscsi_name.sh
     min-ready: 1
     providers:
-      - name: ci-opstack01
+      - name: ci-opstack02
   - name: dsvm2-slave
     image: dpc-xenial
-    ready-script: invoke_fc_passthrough.sh
+    ready-script: invoke-fc-passthrough-johnny.sh
     min-ready: 1
     providers:
       - name: ci-opstack02
@@ -38,29 +38,29 @@ diskimages:
         - node-devstack
       release: xenial
       env-vars:
-        TMPDIR: /opt/dib_tmp
-        DIB_IMAGE_CACHE: /opt/dib_cache
+        TMPDIR: /opt/dib_tmp_xenial
+        DIB_IMAGE_CACHE: /opt/dib_cache_xenial
 
 providers:
-  - name: ci-opstack01
-    username: 'admin'
-    password: 'openstack'
-    auth-url: 'http://192.168.2.50:5000/v2.0'
-    project-name: 'admin'
-    max-servers: 1
-    boot-timeout: 1200
-    launch-timeout: 3600
-    keypair: 'jenkins'
-    pool: 'external'
-    networks:
-      #TODO: Enter the ID of the "internal" network on the provider
-      - net-id: '207f564f-f036-4aab-97cf-8f34499ad9ca'
-    images:
-      - name: dpc-xenial
-        min-ram: 8192
-        diskimage: dpc-xenial
-        username: jenkins
-        private-key: '/home/nodepool/.ssh/id_rsa'
+#  - name: ci-opstack01
+#    username: 'admin'
+#    password: 'openstack'
+#    auth-url: 'http://192.168.2.50:5000/v3'
+#    project-name: 'admin'
+#    max-servers: 1
+#    boot-timeout: 1200
+#    launch-timeout: 3600
+#    keypair: 'jenkins'
+#    pool: 'external'
+#    networks:
+#      #TODO: Enter the ID of the "internal" network on the provider
+#      - net-id: '207f564f-f036-4aab-97cf-8f34499ad9ca'
+#    images:
+#      - name: dpc-xenial
+#        min-ram: 8192
+#        diskimage: dpc-xenial
+#        username: jenkins
+#        private-key: '/home/nodepool/.ssh/id_rsa'
   - name: ci-opstack02
     username: 'admin'
     password: 'openstack'

@@ -177,6 +177,8 @@
           san_password=IPStor101
           san_ip=192.168.2.42
           fss_pool=1
+          ##fss_pools=A:1
+          fss_debug=true
 
           # Use test-config because the tempest configuration file is
           # overwritten with the .sample after post-config.
@@ -190,13 +192,22 @@
           backup=false
           EOF
 
-          echo "Configure localrc.tmp file to properly setup CINDER_ENABLED_BACKENDS"
-          cat <<EOF >>$BASE/new/devstack/localrc.tmp
-          CINDER_ENABLED_BACKENDS=FSS-FC:FSSFCDriver
-          ATTACH_ENCRYPTED_VOLUME_AVAILABLE=False
-          EOF
+          ##echo "Configure localrc.tmp file to properly setup CINDER_ENABLED_BACKENDS"
+          ##cat <<EOF >>$BASE/new/devstack/localrc.tmp
+          ##CINDER_ENABLED_BACKENDS=FSS-FC:FSSFCDriver
+          ##ATTACH_ENCRYPTED_VOLUME_AVAILABLE=False
+          ##EOF
 
-          export DEVSTACK_LOCAL_CONFIG=$(< ${BASE}/new/devstack/localrc.tmp)
+          ##export DEVSTACK_LOCAL_CONFIG=$(< ${BASE}/new/devstack/localrc.tmp)
+
+          sudo sed -i -e '1i[[local|localrc]]\' $BASE/new/devstack/local.conf
+          sudo sed -i -e '2iCINDER_ENABLED_BACKENDS=FSS-FC:FSSFCDriver\' $BASE/new/devstack/local.conf
+          sudo sed -i -e '3iATTACH_ENCRYPTED_VOLUME_AVAILABLE=False\' $BASE/new/devstack/local.conf
+
+          #echo "Downloading custom tempest to skip shelve tests"
+          #cd $BASE/new/tempest/tempest/api/compute/volumes
+          #wget -O test_attach_volume.py http://192.168.2.32/privateCK/test_attach_volume.py
+          #chmod 0664 test_attach_volume.py
 
           }}
 
@@ -249,6 +260,8 @@
           san_password=IPStor101
           san_ip=192.168.2.22
           fss_pool=1
+          ##fss_pools=A:1
+          fss_debug=true
 
           # Use test-config because the tempest configuration file is
           # overwritten with the .sample after post-config.
@@ -262,13 +275,22 @@
           backup=false
           EOF
 
-          echo "Configure localrc.tmp file to properly setup CINDER_ENABLED_BACKENDS"
-          cat <<EOF >>$BASE/new/devstack/localrc.tmp
-          CINDER_ENABLED_BACKENDS=FSS:FSSISCSIDriver
-          ATTACH_ENCRYPTED_VOLUME_AVAILABLE=False
-          EOF
+          ##echo "Configure localrc.tmp file to properly setup CINDER_ENABLED_BACKENDS"
+          ##cat <<EOF >>$BASE/new/devstack/localrc.tmp
+          ##CINDER_ENABLED_BACKENDS=FSS:FSSISCSIDriver
+          ##ATTACH_ENCRYPTED_VOLUME_AVAILABLE=False
+          ##EOF
 
-          export DEVSTACK_LOCAL_CONFIG=$(< ${BASE}/new/devstack/localrc.tmp)
+          ##export DEVSTACK_LOCAL_CONFIG=$(< ${BASE}/new/devstack/localrc.tmp)
+
+          sudo sed -i -e '1i[[local|localrc]]\' $BASE/new/devstack/local.conf
+          sudo sed -i -e '2iCINDER_ENABLED_BACKENDS=FSS:FSSISCSIDriver\' $BASE/new/devstack/local.conf
+          sudo sed -i -e '3iATTACH_ENCRYPTED_VOLUME_AVAILABLE=False\' $BASE/new/devstack/local.conf
+
+          #echo "Downloading custom tempest to skip shelve tests"
+          #cd $BASE/new/tempest/tempest/api/compute/volumes
+          #wget -O test_attach_volume.py http://192.168.2.32/privateCK/test_attach_volume.py
+          #chmod 0664 test_attach_volume.py
 
           }}
 
