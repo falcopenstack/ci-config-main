@@ -23,3 +23,4 @@ if [ -z "$INITNAME" ]; then
 fi
 echo "InitiatorName=$INITNAME" | sudo tee /etc/iscsi/initiatorname.iscsi
 sudo service open-iscsi restart
+sudo service iscsid restart
