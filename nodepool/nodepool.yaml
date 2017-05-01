@@ -16,13 +16,13 @@ gearman-servers:
 labels:
   - name: dsvm-slave
     image: dpc-xenial
-    ready-script: set_iscsi_name.sh
+    ready-script: set_iscsi_name_v4.sh
     min-ready: 1
     providers:
       - name: ci-opstack02
   - name: dsvm2-slave
     image: dpc-xenial
-    ready-script: invoke-fc-passthrough-johnny.sh
+    ready-script: invoke-fc-passthrough-johnny_v4.sh
     min-ready: 1
     providers:
       - name: ci-opstack02
